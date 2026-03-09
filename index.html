@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generador de Claves</title>
+  <meta name="theme-color" content="#0a0e1a">
+  <meta name="description" content="Generador de contraseñas seguras">
+  <link rel="manifest" href="manifest.json">
+  <title>CLV</title>
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
 
@@ -320,29 +323,26 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(0,212,25
       <button class="modal-close" onclick="closeHelpBtn()">✕</button>
     </div>
     <div class="modal-body">
-      <p><strong class="hl">¿Cómo funciona el Texto Generador?</strong>
-      La frase o palabra que introduces sirve de base para calcular tu contraseña. Pueden usarse letras (A-Z, a-z), números (0-9), la arroba (@) y el punto (.). Cualquier otro carácter se ignora automáticamente.</p>
+      <p><strong class="hl">¿Qué es el Texto Generador?</strong><br>
+      Es la frase o palabra que introduces y que sirve de base para calcular tu contraseña. Pueden usarse letras (A-Z, a-z), números (0-9), la arroba (@) y el punto (.). Cualquier otro carácter se ignora automáticamente.</p>
 
-      <p><strong class="hl">Niveles de complejidad</strong>
+      <p><strong class="hl">Niveles de complejidad</strong><br>
       Definen el tamaño de la matriz interna usada en el cálculo:<br>
       · <em>Básico</em> — matriz de 64 caracteres<br>
       · <em>Medio</em> — matriz de 81 caracteres<br>
       · <em>Alto</em> — matriz de 100 caracteres<br>
       A mayor complejidad, mayor variedad de símbolos en la contraseña resultante.</p>
 
-      <p><strong class="hl">Longitud de la contraseña</strong>
-      Elige cuántos caracteres tendrá la contraseña final: 4, 8, 12 ó 16.</p>
+      <p><strong class="hl">Longitud de la contraseña</strong><br>
+      Elige cuántos caracteres tendrá la contraseña final: 4, 8, 12 ó 16. Si tu texto generador es más corto que la longitud elegida, se reutiliza automáticamente.</p>
 
-      <p><strong class="hl">Matrices y Semilla</strong>
+      <p><strong class="hl">Matrices y Semilla</strong><br>
       Al abrirse por primera vez, el programa genera tres matrices internas aleatorias únicas que quedan guardadas en tu navegador. Estas matrices son las responsables de que el mismo texto generador produzca siempre la misma contraseña en tu dispositivo.<br><br>
       Puedes <em>exportar</em> esas matrices como un archivo semilla (.json) para poder recuperarlas en otro navegador u ordenador mediante la opción <em>importar</em>, obteniendo así exactamente las mismas contraseñas.<br><br>
-      El botón <em>Nueva Semilla</em> regenera matrices completamente nuevas; ten en cuenta que a partir de ese momento, los mismos textos generarán contraseñas distintas.</p>
+      El botón <em>Nueva Semilla</em> regenera matrices completamente nuevas; a partir de ese momento, los mismos textos generarán contraseñas distintas.</p>
 
-      <p><strong class="hl">Reproducibilidad</strong>
-      <em>Misma semilla</em> + Mismo texto generador + mismo nivel de complejidad = siempre la misma contraseña. Nunca se almacena ninguna contraseña; se recalcula cada vez.<br><br>
-	  Recuerda siempre <em>exportar</em> la semilla que decidas sea la tuya, bien sea la de la primera instalación o bien la nueva generada.<br>
-	  Esa semilla será la que <em>importarás</em> para que se generen siempre las mismas contraseñas, en otro navegador.<br><br>
-	  El programa siempre utilizará la última semilla, no hace falta importarla cada vez que lo abras.</p>
+      <p><strong class="hl">Reproducibilidad</strong><br>
+      Mismo texto generador + mismo nivel de complejidad + mismas matrices = siempre la misma contraseña. Nunca se almacena ninguna contraseña; se recalcula cada vez.</p>
     </div>
   </div>
 </div>
