@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Claves</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --bg:       #0a0e1a;
+  --surface:  #0f1623;
+  --border:   #1e2d45;
+  --accent:   #00d4ff;
+  --accent2:  #ff6b35;
+  --accent3:  #7fff6b;
+  --text:     #c8d8e8;
+  --text-dim: #5a7a9a;
+}
+[data-theme="light"] {
+  --bg:       #f0f4f8;
+  --surface:  #ffffff;
+  --border:   #c0ccd8;
+  --accent:   #0077aa;
+  --accent2:  #cc4400;
+  --accent3:  #227700;
+  --text:     #1a2a3a;
+  --text-dim: #6080a0;
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="system"] {
+    --bg:       #f0f4f8;
+    --surface:  #ffffff;
+    --border:   #c0ccd8;
+    --accent:   #0077aa;
+    --accent2:  #cc4400;
+    --accent3:  #227700;
+    --text:     #1a2a3a;
+    --text-dim: #6080a0;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(0,212,255,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 80%, rgba(255,107,53,0.03) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+[data-theme="light"] body::before,
+[data-theme="system"] body::before { display: none; }
+
+.scanlines {
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+  pointer-events: none; z-index: 999;
+}
+[data-theme="light"] .scanlines { display: none; }
+
+.container {
+  position: relative; z-index: 1;
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+header { text-align: center; margin-bottom: 2rem; }
+
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.4rem, 4vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-shadow: 0 0 30px rgba(0,212,255,0.5), 0 0 60px rgba(0,212,255,0.15);
+  animation: flicker 8s infinite;
+}
+[data-theme="light"] .logo { text-shadow: none; animation: none; }
+@keyframes flicker {
+  0%,95%,100% { opacity:1; } 96% { opacity:0.82; } 97% { opacity:1; } 98% { opacity:0.9; }
+}
+
+.subtitle {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+.card, .full-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  position: relative;
+  transition: background 0.3s, border-color 0.3s;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.45;
+}
+.full-card { margin-top: 1.5rem; }
+.full-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  opacity: 0.45;
+}
+
+.card-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 1.1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.card-title::before { content: '//'; color: var(--text-dim); }
+
+.top-bar { margin-bottom: 1.5rem; }
+.top-bar-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.8rem;
+}
+.top-bar-group { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+.top-label { font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.theme-tabs { display: flex; gap: 0.35rem; }
+
+.ttab {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.ttab:hover { border-color: var(--accent); color: var(--text); }
+.ttab.active { background: rgba(0,212,255,0.08); border-color: var(--accent); color: var(--accent); }
+[data-theme="light"] .ttab.active { background: rgba(0,119,170,0.1); }
+
+.help-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  padding: 0.4rem 1rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.help-btn:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(255,107,53,0.06); }
+
+label {
+  display: block;
+  font-size: 0.72rem; color: var(--text-dim);
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--accent3);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  padding: 0.75rem;
+  resize: vertical; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-height: 90px;
+}
+textarea:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(0,212,255,0.12); }
+
+.complexity-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.tab {
+  flex: 1;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+  color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem; letter-spacing: 0.05em; padding: 0.55rem 0.3rem;
+  cursor: pointer; transition: all 0.2s; text-align: center; user-select: none;
+}
+.tab:hover { border-color: var(--accent); color: var(--text); }
+.tab.active { background: rgba(0,212,255,0.08); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px rgba(0,212,255,0.12); }
+.tab.active.medium { background: rgba(255,107,53,0.08); border-color: var(--accent2); color: var(--accent2); box-shadow: 0 0 12px rgba(255,107,53,0.12); }
+.tab.active.high   { background: rgba(127,255,107,0.08); border-color: var(--accent3); color: var(--accent3); box-shadow: 0 0 12px rgba(127,255,107,0.12); }
+
+.length-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.4rem; }
+.len-btn {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+  color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem; padding: 0.45rem;
+  cursor: pointer; transition: all 0.2s; text-align: center; user-select: none;
+}
+.len-btn:hover { border-color: var(--accent); color: var(--text); }
+.len-btn.active { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+
+.generate-btn {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,212,255,0.04));
+  border: 1px solid var(--accent); border-radius: 3px;
+  color: var(--accent); font-family: 'Orbitron', monospace;
+  font-size: 0.82rem; font-weight: 700; letter-spacing: 0.2em; padding: 0.9rem;
+  cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+  margin-top: 1rem; box-shadow: 0 0 15px rgba(0,212,255,0.08);
+}
+.generate-btn:hover {
+  background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.08));
+  box-shadow: 0 0 25px rgba(0,212,255,0.25); transform: translateY(-1px);
+}
+.generate-btn:active { transform: translateY(0); }
+
+.result-area { margin-top: 1.2rem; }
+.result-box {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+  padding: 0.9rem 1rem; min-height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+}
+.result-password {
+  font-family: 'Share Tech Mono', monospace; font-size: 1.25rem;
+  color: var(--accent3); text-shadow: 0 0 12px rgba(127,255,107,0.35);
+  letter-spacing: 0.12em; word-break: break-all; flex: 1;
+}
+[data-theme="light"] .result-password { text-shadow: none; }
+
+.copy-btn {
+  background: transparent; border: 1px solid var(--border); border-radius: 3px;
+  color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem; padding: 0.4rem 0.8rem;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.copy-btn:hover, .copy-btn.copied { border-color: var(--accent3); color: var(--accent3); }
+
+.seed-section {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem; margin-top: 0.6rem;
+}
+@media (max-width: 460px) { .seed-section { grid-template-columns: 1fr; } }
+
+.action-btn {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+  color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.04em; padding: 0.55rem 0.8rem;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.action-btn:hover        { border-color: var(--accent);  color: var(--accent);  background: rgba(0,212,255,0.05); }
+.action-btn.danger:hover { border-color: #ff4466;         color: #ff4466;         background: rgba(255,68,102,0.05); }
+.action-btn.safe:hover   { border-color: var(--accent3);  color: var(--accent3); background: rgba(127,255,107,0.05); }
+
+.status-bar {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 3px;
+  padding: 0.5rem 0.9rem; font-size: 0.7rem; color: var(--text-dim);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent3); box-shadow: 0 0 6px rgba(127,255,107,0.6);
+  animation: pulse 2s infinite; flex-shrink: 0;
+}
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+
+#fileInput { display: none; }
+
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+  max-width: 540px; width: 90%; max-height: 80vh; overflow-y: auto;
+  animation: modalIn 0.2s ease;
+}
+@keyframes modalIn { from { transform: scale(0.95); opacity:0; } to { transform:scale(1); opacity:1; } }
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 1.5rem 0.8rem; border-bottom: 1px solid var(--border);
+}
+.modal-close {
+  background: transparent; border: none; color: var(--text-dim);
+  font-size: 1rem; cursor: pointer; transition: color 0.2s;
+}
+.modal-close:hover { color: var(--accent2); }
+.modal-body {
+  padding: 1.3rem 1.5rem 1.5rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.modal-body p { font-size: 0.8rem; color: var(--text); line-height: 1.75; }
+.modal-body strong.hl { color: var(--accent); font-weight: normal; display: block; margin-bottom: 0.2rem; }
+.modal-body em { color: var(--accent2); font-style: normal; }
+  </style>
+</head>
+<body>
+<div class="scanlines"></div>
+
+<!-- MODAL AYUDA -->
+<div id="helpModal" class="modal-overlay" onclick="closeHelp(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="card-title">Ayuda</span>
+      <button class="modal-close" onclick="closeHelpBtn()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong class="hl">¿Cómo funciona el Texto Generador?</strong>
+      La frase o palabra que introduces sirve de base para calcular tu contraseña. Pueden usarse letras (A-Z, a-z), números (0-9), la arroba (@) y el punto (.). Cualquier otro carácter se ignora automáticamente.</p>
+
+      <p><strong class="hl">Niveles de complejidad</strong>
+      Definen el tamaño de la matriz interna usada en el cálculo:<br>
+      · <em>Básico</em> — matriz de 64 caracteres<br>
+      · <em>Medio</em> — matriz de 81 caracteres<br>
+      · <em>Alto</em> — matriz de 100 caracteres<br>
+      A mayor complejidad, mayor variedad de símbolos en la contraseña resultante.</p>
+
+      <p><strong class="hl">Longitud de la contraseña</strong>
+      Elige cuántos caracteres tendrá la contraseña final: 4, 8, 12 ó 16.</p>
+
+      <p><strong class="hl">Matrices y Semilla</strong>
+      Al abrirse por primera vez, el programa genera tres matrices internas aleatorias únicas que quedan guardadas en tu navegador. Estas matrices son las responsables de que el mismo texto generador produzca siempre la misma contraseña en tu dispositivo.<br><br>
+      Puedes <em>exportar</em> esas matrices como un archivo semilla (.json) para poder recuperarlas en otro navegador u ordenador mediante la opción <em>importar</em>, obteniendo así exactamente las mismas contraseñas.<br><br>
+      El botón <em>Nueva Semilla</em> regenera matrices completamente nuevas; ten en cuenta que a partir de ese momento, los mismos textos generarán contraseñas distintas.</p>
+
+      <p><strong class="hl">Reproducibilidad</strong>
+      <em>Misma semilla</em> + Mismo texto generador + mismo nivel de complejidad = siempre la misma contraseña. Nunca se almacena ninguna contraseña; se recalcula cada vez.<br><br>
+	  Recuerda siempre <em>exportar</em> la semilla que decidas sea la tuya, bien sea la de la primera instalación o bien la nueva generada.<br>
+	  Esa semilla será la que <em>importarás</em> para que se generen siempre las mismas contraseñas, en otro navegador.<br><br>
+	  El programa siempre utilizará la última semilla, no hace falta importarla cada vez que lo abras.</p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <header>
+    <div class="logo">⬡ GENERADOR DE CLAVES</div>
+    <div class="subtitle">Cifrado determinista de contraseñas</div>
+  </header>
+
+  <div class="top-bar card">
+    <div class="top-bar-inner">
+      <div class="top-bar-group">
+        <span class="top-label">Tema</span>
+        <div class="theme-tabs">
+          <button class="ttab" id="tt-light"  onclick="setTheme('light')">Claro</button>
+          <button class="ttab" id="tt-dark"   onclick="setTheme('dark')">Oscuro</button>
+          <button class="ttab active" id="tt-system" onclick="setTheme('system')">Por defecto</button>
+        </div>
+      </div>
+      <button class="help-btn" onclick="openHelp()">? Ayuda</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-title">Configuración</div>
+
+      <label>Texto Generador</label>
+      <textarea id="seedText" placeholder="Escribe tu texto generador aquí...&#10;(A-Z, a-z, 0-9, @ y .)"></textarea>
+
+      <div style="margin-top:1rem;">
+        <label>Nivel de Complejidad</label>
+        <div class="complexity-tabs">
+          <div class="tab active" id="tab-basic"  onclick="setComplexity('basic')">BÁSICO</div>
+          <div class="tab"        id="tab-medium" onclick="setComplexity('medium')">MEDIO</div>
+          <div class="tab"        id="tab-high"   onclick="setComplexity('high')">ALTO</div>
+        </div>
+      </div>
+
+      <div style="margin-top:1rem;">
+        <label>Longitud de Contraseña</label>
+        <div class="length-grid">
+          <div class="len-btn"        id="len-4"  onclick="setLength(4)">4</div>
+          <div class="len-btn active" id="len-8"  onclick="setLength(8)">8</div>
+          <div class="len-btn"        id="len-12" onclick="setLength(12)">12</div>
+          <div class="len-btn"        id="len-16" onclick="setLength(16)">16</div>
+        </div>
+      </div>
+
+      <button class="generate-btn" onclick="generatePassword()">▶ GENERAR CONTRASEÑA</button>
+
+      <div class="result-area">
+        <label>Contraseña Generada</label>
+        <div class="result-box">
+          <span class="result-password" id="resultPassword">──────────</span>
+          <button class="copy-btn" id="copyBtn" onclick="copyPassword()">COPIAR</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="full-card">
+      <div class="card-title" style="color:var(--accent2)">Gestión de Semillas</div>
+      <div class="seed-section">
+        <button class="action-btn danger" onclick="regenerateMatrices()">↺ Nueva Semilla</button>
+        <button class="action-btn safe"   onclick="exportSeed()">⬇ Exportar Semilla</button>
+        <button class="action-btn safe"   onclick="document.getElementById('fileInput').click()">⬆ Importar Semilla</button>
+      </div>
+      <div style="margin-top:0.8rem;">
+        <div class="status-bar">
+          <div class="status-dot"></div>
+          <span id="statusText">Cargando...</span>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept=".json" onchange="importSeed(event)">
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE_MATRICES = {
+  basic: [
+    ['A','a','B','b','C','c','D','d'],
+    ['E','e','F','f','G','g','H','h'],
+    ['I','i','J','j','K','k','L','l'],
+    ['M','m','N','n','O','o','P','p'],
+    ['Q','q','R','r','S','s','T','t'],
+    ['U','u','V','v','W','w','X','x'],
+    ['Y','y','Z','z','0','1','2','3'],
+    ['4','5','6','7','8','9','@','.']
+  ],
+  medium: [
+    ['A','a','B','b','C','c','D','d','E'],
+    ['e','F','f','G','g','H','h','I','i'],
+    ['J','j','K','k','L','l','M','m','N'],
+    ['n','O','o','P','p','Q','q','R','r'],
+    ['S','s','T','t','U','u','V','v','W'],
+    ['w','X','x','Y','y','Z','z','0','1'],
+    ['2','3','4','5','6','7','8','9','@'],
+    ['.','¡','!','(',')',']','[','{','}'],
+    ['¿','?','>','<','#','$','%','&','=']
+  ],
+  high: [
+    ['A','a','B','b','C','c','D','d','E','e'],
+    ['F','f','G','g','H','h','I','i','J','j'],
+    ['K','k','L','l','M','m','N','n','O','o'],
+    ['P','p','Q','q','R','r','S','s','T','t'],
+    ['U','u','V','v','W','w','X','x','Y','y'],
+    ['Z','z','0','1','2','3','4','5','6','7'],
+    ['8','9','@','.','¡','!','(',')',']','['],
+    ['{','}','¿','?','>','<','#','$','%','&'],
+    ['=','+','-','*','^','/','|','\\','ª','º'],
+    ['"','·','~','¬',"'",',',';',':','_','´']
+  ]
+};
+
+const KNIGHT_MOVES = [
+  [+2,+1],[+1,+2],[-1,+2],[-2,+1],
+  [-2,-1],[-1,-2],[+1,-2],[+2,-1]
+];
+
+const VALID_CHARS = /[A-Za-z0-9@.]/g;
+
+function sanitizeInput(text) {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').match(VALID_CHARS)?.join('') ?? '';
+}
+
+const state = { complexity: 'basic', length: 8, randomMatrices: null, currentMatrixView: 'basic' };
+
+function makeRng(seed) {
+  let s = seed >>> 0;
+  return () => { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 4294967296; };
+}
+
+function shuffleArray(arr, rng) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function flatTo2D(flat, size) {
+  const m = [];
+  for (let r = 0; r < size; r++) m.push(flat.slice(r * size, r * size + size));
+  return m;
+}
+
+function generateRandomMatrix(base, seed) {
+  return flatTo2D(shuffleArray(base.flat(), makeRng(seed)), base.length);
+}
+
+function generateAllMatrices(seeds) {
+  return {
+    basic:  generateRandomMatrix(BASE_MATRICES.basic,  seeds.basic),
+    medium: generateRandomMatrix(BASE_MATRICES.medium, seeds.medium),
+    high:   generateRandomMatrix(BASE_MATRICES.high,   seeds.high)
+  };
+}
+
+function generateSeeds() {
+  return {
+    basic:  Math.floor(Math.random() * 2147483647) + 1,
+    medium: Math.floor(Math.random() * 2147483647) + 1,
+    high:   Math.floor(Math.random() * 2147483647) + 1
+  };
+}
+
+function findInMatrix(matrix, char) {
+  for (let r = 0; r < matrix.length; r++)
+    for (let c = 0; c < matrix[r].length; c++)
+      if (matrix[r][c] === char) return [r, c];
+  return null;
+}
+
+function knightMove(row, col, counter, size) {
+  const [dr, dc] = KNIGHT_MOVES[counter % 8];
+  return [((row + dr) % size + size) % size, ((col + dc) % size + size) % size];
+}
+
+function generatePassword() {
+  const validText = sanitizeInput(document.getElementById('seedText').value);
+  if (!validText.length) { document.getElementById('resultPassword').textContent = '──────────'; return; }
+
+  const { complexity, length: target } = state;
+  const rndMatrix = state.randomMatrices[complexity];
+  const size      = BASE_MATRICES[complexity].length;
+
+  let work = validText;
+  while (work.length < target) work += validText;
+  work = work.slice(0, target);
+
+  const counters = {};
+  let pw = '';
+
+  for (let i = 0; i < target; i++) {
+    const ch = work[i];
+    const bp = findInMatrix(BASE_MATRICES[complexity], ch);
+    if (!bp) continue;
+    const rc = rndMatrix[bp[0]][bp[1]];
+    const sp = findInMatrix(rndMatrix, rc);
+    if (!sp) continue;
+    if (!(ch in counters)) counters[ch] = 0;
+    const [dr, dc] = knightMove(sp[0], sp[1], counters[ch], size);
+    pw += rndMatrix[dr][dc];
+    counters[ch]++;
+  }
+  document.getElementById('resultPassword').textContent = pw;
+}
+
+function setComplexity(c) {
+  state.complexity = c;
+  ['basic','medium','high'].forEach(x => {
+    const el = document.getElementById(`tab-${x}`);
+    el.className = 'tab' + (x !== c ? '' : (' active' + (x === 'medium' ? ' medium' : x === 'high' ? ' high' : '')));
+  });
+  state.currentMatrixView = c;
+}
+
+function setLength(l) {
+  state.length = l;
+  [4,8,12,16].forEach(x => { document.getElementById(`len-${x}`).className = 'len-btn' + (x === l ? ' active' : ''); });
+}
+
+function copyPassword() {
+  const pw = document.getElementById('resultPassword').textContent;
+  if (pw === '──────────') return;
+  navigator.clipboard.writeText(pw).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ COPIADO'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPIAR'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('gk_theme', theme);
+  ['dark','system','light'].forEach(t => { document.getElementById(`tt-${t}`).classList.toggle('active', t === theme); });
+}
+
+function openHelp()    { document.getElementById('helpModal').classList.add('open'); }
+function closeHelpBtn(){ document.getElementById('helpModal').classList.remove('open'); }
+function closeHelp(e)  { if (e.target === document.getElementById('helpModal')) closeHelpBtn(); }
+
+function exportSeed() {
+  const seeds = JSON.parse(localStorage.getItem('gk_seeds') || 'null');
+  if (!seeds) return;
+  const now = new Date();
+  const fname = `semilla_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}.json`;
+  const blob = new Blob([JSON.stringify({ version: 1, seeds }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = fname; a.click();
+  URL.revokeObjectURL(url);
+  setStatus(`Semillas exportadas en archivo "${fname}"`);
+}
+
+function importSeed(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const fname = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.seeds?.basic || !data.seeds?.medium || !data.seeds?.high)
+        throw new Error('Formato de semilla no válido');
+      localStorage.setItem('gk_seeds', JSON.stringify(data.seeds));
+      state.randomMatrices = generateAllMatrices(data.seeds);
+      setStatus(`Semillas importadas del archivo "${fname}"`);
+    } catch (err) {
+      setStatus('⚠ Error al importar: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function regenerateMatrices() {
+  if (!confirm('¿Generar una nueva semilla?\n\nLos mismos textos generadores producirán contraseñas distintas a partir de este momento.\nSe recomienda exportar la semilla actual antes de continuar.')) return;
+  const seeds = generateSeeds();
+  localStorage.setItem('gk_seeds', JSON.stringify(seeds));
+  state.randomMatrices = generateAllMatrices(seeds);
+  setStatus('Nueva semilla generada — recuerda exportarla para no perderla');
+}
+
+(function init() {
+  setTheme(localStorage.getItem('gk_theme') || 'system');
+  let seeds = JSON.parse(localStorage.getItem('gk_seeds') || 'null');
+  if (!seeds) {
+    seeds = generateSeeds();
+    localStorage.setItem('gk_seeds', JSON.stringify(seeds));
+    setStatus('Semillas generadas durante la primera apertura — recuerda exportarlas para no perderlas');
+  } else {
+    setStatus('Semillas cargadas correctamente');
+  }
+  state.randomMatrices = generateAllMatrices(seeds);
+})();
+</script>
+</body>
+</html>
