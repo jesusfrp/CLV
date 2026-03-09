@@ -2,7 +2,7 @@
 <html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a0e1a">
   <meta name="description" content="Generador de contraseñas seguras">
   <link rel="manifest" href="manifest.json">
@@ -310,6 +310,42 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(0,212,25
 .modal-body p { font-size: 0.8rem; color: var(--text); line-height: 1.75; }
 .modal-body strong.hl { color: var(--accent); font-weight: normal; display: block; margin-bottom: 0.2rem; }
 .modal-body em { color: var(--accent2); font-style: normal; }
+
+/* ─── MÓVIL ─── */
+@media (max-width: 600px) {
+  .container { padding: 1rem; }
+
+  .logo { font-size: clamp(1.6rem, 7vw, 2.2rem); letter-spacing: 0.1em; }
+  .subtitle { font-size: 0.7rem; letter-spacing: 0.15em; }
+
+  .card, .full-card { padding: 1.1rem; }
+
+  .card-title { font-size: 0.75rem; margin-bottom: 0.9rem; }
+
+  label { font-size: 0.8rem; }
+
+  textarea { font-size: 1.05rem; min-height: 80px; padding: 0.65rem; }
+
+  .top-label { font-size: 0.8rem; }
+  .ttab { font-size: 0.78rem; padding: 0.45rem 0.7rem; }
+  .help-btn { font-size: 0.85rem; padding: 0.45rem 1rem; }
+
+  .tab { font-size: 0.85rem; padding: 0.6rem 0.3rem; }
+
+  .len-btn { font-size: 0.95rem; padding: 0.6rem; }
+
+  .generate-btn { font-size: 0.9rem; padding: 1rem; letter-spacing: 0.15em; }
+
+  .result-password { font-size: 1.4rem; }
+  .copy-btn { font-size: 0.8rem; padding: 0.5rem 1rem; }
+
+  .action-btn { font-size: 0.78rem; padding: 0.65rem 0.5rem; }
+
+  .status-bar { font-size: 0.78rem; padding: 0.55rem 0.9rem; }
+  .status-dot { width: 8px; height: 8px; }
+
+  .modal-body p { font-size: 0.88rem; }
+}
   </style>
 </head>
 <body>
@@ -323,26 +359,29 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(0,212,25
       <button class="modal-close" onclick="closeHelpBtn()">✕</button>
     </div>
     <div class="modal-body">
-      <p><strong class="hl">¿Qué es el Texto Generador?</strong><br>
-      Es la frase o palabra que introduces y que sirve de base para calcular tu contraseña. Pueden usarse letras (A-Z, a-z), números (0-9), la arroba (@) y el punto (.). Cualquier otro carácter se ignora automáticamente.</p>
+       <p><strong class="hl">¿Como funciona el Texto Generador?</strong>
+      La frase o palabra que introduces sirve de base para calcular tu contraseña. Pueden usarse letras (A-Z, a-z), números (0-9), la arroba (@) y el punto (.). Cualquier otro carácter se ignora automáticamente.</p>
 
-      <p><strong class="hl">Niveles de complejidad</strong><br>
+      <p><strong class="hl">Niveles de complejidad</strong>
       Definen el tamaño de la matriz interna usada en el cálculo:<br>
       · <em>Básico</em> — matriz de 64 caracteres<br>
       · <em>Medio</em> — matriz de 81 caracteres<br>
       · <em>Alto</em> — matriz de 100 caracteres<br>
       A mayor complejidad, mayor variedad de símbolos en la contraseña resultante.</p>
 
-      <p><strong class="hl">Longitud de la contraseña</strong><br>
-      Elige cuántos caracteres tendrá la contraseña final: 4, 8, 12 ó 16. Si tu texto generador es más corto que la longitud elegida, se reutiliza automáticamente.</p>
+      <p><strong class="hl">Longitud de la contraseña</strong>
+      Elige cuántos caracteres tendrá la contraseña final: 4, 8, 12 ó 16.</p>
 
-      <p><strong class="hl">Matrices y Semilla</strong><br>
+      <p><strong class="hl">Matrices y Semilla</strong>
       Al abrirse por primera vez, el programa genera tres matrices internas aleatorias únicas que quedan guardadas en tu navegador. Estas matrices son las responsables de que el mismo texto generador produzca siempre la misma contraseña en tu dispositivo.<br><br>
       Puedes <em>exportar</em> esas matrices como un archivo semilla (.json) para poder recuperarlas en otro navegador u ordenador mediante la opción <em>importar</em>, obteniendo así exactamente las mismas contraseñas.<br><br>
-      El botón <em>Nueva Semilla</em> regenera matrices completamente nuevas; a partir de ese momento, los mismos textos generarán contraseñas distintas.</p>
+      El botón <em>Nueva Semilla</em> regenera matrices completamente nuevas; ten en cuenta que a partir de ese momento, los mismos textos generarán contraseñas distintas.</p>
 
-      <p><strong class="hl">Reproducibilidad</strong><br>
-      Mismo texto generador + mismo nivel de complejidad + mismas matrices = siempre la misma contraseña. Nunca se almacena ninguna contraseña; se recalcula cada vez.</p>
+      <p><strong class="hl">Reproducibilidad</strong>
+      <em>Misma semilla</em> + mismo texto generador + mismo nivel de complejidad = siempre la misma contraseña. Nunca se almacena ninguna contraseña; se recalcula cada vez.<br><br>
+	  Recuerda siempre <em>exportar</em> la semilla que decidas sea la tuya, bien sea la de la primera instalación o bien la nueva generada.<br>
+	  Esa semilla será la que <em>importarás</em> en otro navegador para que se generen siempre las mismas contraseñas.<br><br>
+	  El programa siempre utilizará la última semilla, no hace falta importarla cada vez que lo abras.</p>
     </div>
   </div>
 </div>
